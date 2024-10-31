@@ -108,12 +108,6 @@ This is an example of how to list things you need to use the software and how to
    ```js
    ZHIPUAI_API_KEY='ENTER YOUR API';
    ```
-6. commit and push
-   ```sh
-   git add
-   git commit -m
-   git push
-   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

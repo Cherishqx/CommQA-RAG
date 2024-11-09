@@ -4,15 +4,17 @@ from dotenv import find_dotenv, load_dotenv
 from embedding import ZhipuAIEmbeddingModel
 from VectorBase import find_similar_chunks, load_embedding
 from llm import ZhipuAIChatModel, ChatModel
+from src.embedding import BgeLargeZhv15
 
 # 加载环境变量
 load_dotenv()
 # 加载 .env 文件
-# _ = load_dotenv(find_dotenv())
+#_ = load_dotenv(find_dotenv())
 
 # 初始化模型
 embedding_models = {
     "ZhipuAI": ZhipuAIEmbeddingModel(api_key=os.getenv("ZHIPUAI_API_KEY")),
+    "bge-large-zh-v1.5": BgeLargeZhv15(),
     # "OtherModel OtherEmbeddingModel(api_key="your_api_key"),
 }
 
@@ -45,7 +47,9 @@ def llm_reply(user_input, model_dropdown, temperature_slider, maximum_token_slid
 
     return [[user_input, gpt_response]]
 
-results = load_embedding(LaTex_path='./main.tex', json_path='./vectors.json')   
+# results = load_embedding(LaTex_path='./main.tex', json_path='./vectors.json')
+# 为什么相对路径不行？
+results = load_embedding(LaTex_path='./main.tex', json_path='../vectors.json')
 
 with gr.Blocks() as demo:
     with gr.Row():
@@ -77,7 +81,7 @@ with gr.Blocks() as demo:
                                              )
             embedding_model_dropdown = gr.Dropdown(
                 choices=list(embedding_models.keys()),
-                value="ZhipuAI",
+                value="bge-large-zh-v1.5",
                 label="Embedding Model",
                 interactive=True
             )

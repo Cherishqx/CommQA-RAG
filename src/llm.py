@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from zhipuai import ZhipuAI
 
+from src.embedding import BgeLargeZhv15
+
+
 class ChatModel(ABC):
     @abstractmethod
     def generate_reply(self, user_input, context, model, temperature, max_tokens):

@@ -100,15 +100,18 @@ This is an example of how to list things you need to use the software and how to
    conda create CommQA-RAG
    conda activate CommQA-RAG
    ```
-4. install requirements
+4. install requirement(The version of cuda is 11.8)
    ```sh
-   pip install -r requirements.txt
+   conda install --file requirement.txt
    ```
 5. create .env and Enter your API in `.env`
    ```js
    ZHIPUAI_API_KEY='ENTER YOUR API';
    ```
-
+6. download bge-large-zh-v.15
+   ```sh
+   git clone https://huggingface.co/BAAI/bge-large-zh-v1.5
+   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 

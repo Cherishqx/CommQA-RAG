@@ -1,0 +1,10 @@
+1.增加LLM模型：讯飞，通义。。。
+2.增加embedding模型：讯飞，bge，miniCPM
+3.增加embedding选择前端
+4.整合测试集（✔）
+5.导入测试集生成模型测试结果（✔）
+6.保留对话历史记录
+7.增加数据存储记录
+8.增加latex编译器
+
+gradio的运行存在问题，切换embedding模型时不会重新加载vectors

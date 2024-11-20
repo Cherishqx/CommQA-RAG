@@ -93,7 +93,7 @@ This is an example of how to list things you need to use the software and how to
 1. Get a free API Key at https://bigmodel.cn/
 2. Clone the repo
    ```sh
-   git clone https://github.com/3Justice/CommQA-RAG
+   git clone https://github.com/Cherish/CommQA-RAG
    ```
 3. create conda env
    ```sh
@@ -119,9 +119,20 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-生成json文件： 运行VectorBase.py
+1.下载并导入main.tex  
 
-注意更改模型和文件名
+2.运行VectorBase.py
+(注意更改模型和文件名)完成后会生成vectors.json与bge_vectors.json
+
+3.运行src/main.py即可
+
+4.若要测试数据请运行src/test.py
+
+<img width="202" alt="image" src="https://github.com/user-attachments/assets/6de4e657-f98f-4ce2-a1f8-90d9450a84bc">
+
+
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

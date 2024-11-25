@@ -102,7 +102,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 4. install requirement(The version of cuda is 11.8)
    ```sh
-   conda install --file requirement.txt
+   pip install -r requirements.txt
    ```
 5. create .env and Enter your API in `.env`
    ```js

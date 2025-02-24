@@ -16,7 +16,7 @@ class ZhipuAIChatModel(ChatModel):
     def generate_reply(self, user_input,history, context, model, temperature, max_tokens):
         messages = [
             {"role": "system",
-             "content": "你是一位文档问答助手，你基于“文档内容”回答用户的问题。文档内容如下: %s" % context},
+             "content": "你是一位通信习题问答助手，你基于“文档内容”回答用户的问题，公式以md格式输出。文档内容如下: %s" % context},
         ]
         messages.extend(history)  # 添加历史记录
         messages.append({"role": "user", "content": user_input})

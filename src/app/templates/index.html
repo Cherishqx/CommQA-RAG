@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 聊天助手</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -77,10 +78,13 @@
             let chatbox = document.getElementById("chatbox");
             let div = document.createElement("div");
             div.className = `mb-4 ${className === 'user' ? 'text-right' : ''}`;
+
+            let content = className === 'user' ? message : marked.parse(message);
+
             div.innerHTML = `
                 <div class="inline-block max-w-[70%] ${className === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 shadow">
                     <p class="font-semibold">${sender}</p>
-                    <p>${message}</p>
+                    <div class="markdown-content">${content}</div>
                 </div>
             `;
             chatbox.appendChild(div);
@@ -97,4 +101,3 @@
     </script>
 </body>
 </html>
-

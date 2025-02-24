@@ -6,6 +6,9 @@ from VectorBase import find_similar_chunks, load_embedding
 from llm import ZhipuAIChatModel
 from src.embedding import BgeLargeZhv15
 
+###待修改
+
+
 # 加载环境变量
 load_dotenv()
 

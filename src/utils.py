@@ -35,7 +35,16 @@ def extract_text_from_latex(latex_path):
         return f"处理 LaTeX 文件时出现错误: {str(e)}"
     return all_text
 
+#错误代码
+# def split_text_by_punctuation(text):
+#     pattern = r"[---------------------------------------]+"
+#     segments = re.split(pattern, text)
+#     return [segment for segment in segments if segments]
 def split_text_by_punctuation(text):
-    pattern = r"[---------------------------------------]+"
+    pattern = r"---------------------------------------"  # 固定匹配 39 个 '-'
     segments = re.split(pattern, text)
-    return [segment for segment in segments if segments]
+    return [segment for segment in segments if segment]  # 过滤空字符串
+
+if __name__ == '__main__':
+    all_text = extract_all_text("F:\Download\课本+自我巩固+课堂落实（答案）(1).pdf")
+    print(all_text)

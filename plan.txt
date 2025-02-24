@@ -7,4 +7,4 @@
 7.增加数据存储记录
 8.增加latex编译器
 
-gradio的运行存在问题，切换embedding模型时不会重新加载vectors
+gradio的运行存在问题，切换embedding模型时不会重新加载vectors（✔解决）

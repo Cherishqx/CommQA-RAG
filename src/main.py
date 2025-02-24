@@ -1,15 +1,13 @@
 import gradio as gr
 import os
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 from embedding import ZhipuAIEmbeddingModel
-from VectorBase import find_similar_chunks, load_embedding
+from VectorBase import query_chroma
 from llm import ZhipuAIChatModel, ChatModel
 from src.embedding import BgeLargeZhv15
 
 # 加载环境变量
 load_dotenv()
-# 加载 .env 文件
-#_ = load_dotenv(find_dotenv())
 
 # 初始化模型
 embedding_models = {
@@ -25,7 +23,8 @@ conversation_history = []
 
 def llm_reply(user_input, model_dropdown, temperature_slider, maximum_token_slider, embedding_model_name):
     embedding_model = embedding_models[embedding_model_name]
-    similarity_chunks = find_similar_chunks(user_input, results, embedding_model, top_n=3, print_content=True)
+    similarity_chunks = query_chroma(user_input, embedding_model, top_n=3,print_content=True)
+    #similarity_chunks = find_similar_chunks(user_input, results, embedding_model, top_n=3, print_content=True)
     context = similarity_chunks
 
     # 构建对话上下文
@@ -47,11 +46,6 @@ def llm_reply(user_input, model_dropdown, temperature_slider, maximum_token_slid
 
     return [[user_input, gpt_response]]
 
-if True:
-    results = load_embedding('../main.tex',json_path='../bge_vectors.json')
-else:
-    results = load_embedding('../main.tex','../vectors.json')
-
 with gr.Blocks() as demo:
     with gr.Row():
         # 左边对话栏
@@ -65,8 +59,8 @@ with gr.Blocks() as demo:
         # 右边参数栏
         with gr.Column():
             model_dropdown = gr.Dropdown(
-                choices=["glm-4-0520", "glm-4v-plus"],
-                value="glm-4-0520",
+                choices=["glm-4-flash", "glm-4v-plus"],
+                value="glm-4-flash",
                 label="LLM Model",
                 interactive=True
             )

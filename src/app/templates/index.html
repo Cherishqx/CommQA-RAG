@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 聊天助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white p-4 shadow-md">
+        <h1 class="text-2xl font-bold text-center">AI 聊天助手</h1>
+    </header>
+
+    <main class="flex-grow container mx-auto p-4 flex flex-col">
+        <div id="chatbox" class="flex-grow bg-white rounded-lg shadow-md p-4 mb-4 overflow-y-auto h-[calc(100vh-240px)]">
+            <!-- Chat messages will be inserted here -->
+        </div>
+
+        <div class="flex gap-2">
+            <input type="text" id="user_input" placeholder="输入你的问题" class="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="send_button" onclick="sendMessage()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                发送
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let chatHistory = [];
+
+        function sendMessage() {
+            let messageInput = document.getElementById("user_input");
+            let sendButton = document.getElementById("send_button");
+
+            let message = messageInput.value.trim();
+            if (!message) return;
+
+            // Disable input and button
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+
+            updateChatbox("用户", message, "user");
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message, history: chatHistory })
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateChatbox("AI", data.reply, "bot");
+                chatHistory.push({ role: "user", content: message });
+                chatHistory.push({ role: "assistant", content: data.reply });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                updateChatbox("系统", "请求失败，请稍后重试。", "bot");
+            })
+            .finally(() => {
+                // Re-enable input and button
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.value = "";
+                messageInput.focus();
+            });
+        }
+
+        function updateChatbox(sender, message, className) {
+            let chatbox = document.getElementById("chatbox");
+            let div = document.createElement("div");
+            div.className = `mb-4 ${className === 'user' ? 'text-right' : ''}`;
+            div.innerHTML = `
+                <div class="inline-block max-w-[70%] ${className === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 shadow">
+                    <p class="font-semibold">${sender}</p>
+                    <p>${message}</p>
+                </div>
+            `;
+            chatbox.appendChild(div);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Add event listener for Enter key
+        document.getElementById("user_input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+

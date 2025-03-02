@@ -6,47 +6,266 @@
     <title>AI 聊天助手</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .loading {
-            animation: spin 1s linear infinite;
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            width: 150px;
+            background-color: #e6f2ff;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-item {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin: 10px 0;
+            border-radius: 10px;
+            color: #1e3a8a;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .sidebar-item.active {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .icon-top {
+            width: 40px;
+            height: 40px;
+            background-color: #1e3a8a;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            background-color: #ffffff;
+            border-left: 1px solid #ddd;
+        }
+
+        .history-section {
+            width: 250px;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+        }
+
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .new-chat-btn {
+            padding: 10px;
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            background-color: #f0f0f0;
+        }
+
+        .chat-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .chat-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #3b82f6;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+
+        .chat-title {
+            color: #333;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .edit-icon {
+            width: 16px;
+            height: 16px;
+            background-color: #888;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>') no-repeat 50% 50%;
+            mask-size: cover;
+            cursor: pointer;
+        }
+
+        .chat-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .chat-message {
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+
+        .user-message {
+            background-color: #3b82f6;
+            color: #ffffff;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            color: #333333;
+            align-self: flex-start;
+        }
+
+        .message-input-container {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .send-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .send-icon:hover {
+            background-color: #2563eb;
+        }
+
+        .markdown-content {
+            overflow-x: auto;
+        }
+        .markdown-content pre {
+            background-color: #f4f4f4;
+            padding: 1em;
+            border-radius: 4px;
+        }
+        .markdown-content code {
+            font-family: monospace;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="bg-blue-600 text-white p-4 shadow-md">
-        <h1 class="text-2xl font-bold text-center">AI 聊天助手</h1>
-    </header>
-
-    <main class="flex-grow container mx-auto p-4 flex flex-col">
-        <div id="chatbox" class="flex-grow bg-white rounded-lg shadow-md p-4 mb-4 overflow-y-auto h-[calc(100vh-240px)]">
-            <!-- Chat messages will be inserted here -->
+<body>
+    <div class="sidebar">
+        <div class="sidebar-item active" data-page="page1.html">
+            <div class="icon-top"></div>
+            <span>通信原理</span>
         </div>
-
-        <div class="flex gap-2">
-            <input type="text" id="user_input" placeholder="输入你的问题" class="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="send_button" onclick="sendMessage()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                发送
-            </button>
+        <div class="sidebar-item" data-page="page2.html">
+            <div class="icon-top"></div>
+            <span>高等数学</span>
         </div>
-    </main>
+        <div class="sidebar-item" data-page="page3.html">
+            <div class="icon-top"></div>
+            <span>信号与系统</span>
+        </div>
+        <div class="sidebar-item" data-page="page4.html"style="margin-bottom: 100px;">
+            <div class="icon-top"></div>
+            <span>自制资料</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="sidebar-item" data-page="page6.html">
+            <div class="icon-top"></div>
+            <span>更多</span>
+        </div>
+        <div class="sidebar-item" data-page="page7.html">
+            <div class="icon-top"></div>
+            <span>Label</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="history-section">
+            <button class="new-chat-btn" onclick="addNewChat()">＋ 新对话</button>
+            <div id="chatList" class="chat-list"></div>
+        </div>
+        <div class="chat-section">
+            <div id="chatDisplay" class="chat-display"></div>
+            <div class="message-input-container">
+                <input type="text" id="messageInput" class="message-input" placeholder="输入你的问题">
+                <div class="send-icon" onclick="sendMessage()"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         let chatHistory = [];
+        let currentChatId = null;
 
         function sendMessage() {
-            let messageInput = document.getElementById("user_input");
-            let sendButton = document.getElementById("send_button");
-
+            let messageInput = document.getElementById("messageInput");
             let message = messageInput.value.trim();
             if (!message) return;
-
-            // Disable input and button
-            messageInput.disabled = true;
-            sendButton.disabled = true;
 
             updateChatbox("用户", message, "user");
 
@@ -66,38 +285,94 @@
                 updateChatbox("系统", "请求失败，请稍后重试。", "bot");
             })
             .finally(() => {
-                // Re-enable input and button
-                messageInput.disabled = false;
-                sendButton.disabled = false;
                 messageInput.value = "";
                 messageInput.focus();
             });
         }
 
         function updateChatbox(sender, message, className) {
-            let chatbox = document.getElementById("chatbox");
+            let chatDisplay = document.getElementById("chatDisplay");
             let div = document.createElement("div");
-            div.className = `mb-4 ${className === 'user' ? 'text-right' : ''}`;
+            div.className = `chat-message ${className}-message`;
 
             let content = className === 'user' ? message : marked.parse(message);
 
             div.innerHTML = `
-                <div class="inline-block max-w-[70%] ${className === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 shadow">
-                    <p class="font-semibold">${sender}</p>
-                    <div class="markdown-content">${content}</div>
-                </div>
+                <p class="font-semibold">${sender}</p>
+                <div class="markdown-content">${content}</div>
             `;
-            chatbox.appendChild(div);
-            chatbox.scrollTop = chatbox.scrollHeight;
+            chatDisplay.appendChild(div);
+
+            if (className !== 'user') {
+                MathJax.typesetPromise([div]).then(() => {
+                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                });
+            }
         }
 
-        // Add event listener for Enter key
-        document.getElementById("user_input").addEventListener("keypress", function(event) {
+        function addNewChat() {
+            const chatList = document.getElementById("chatList");
+            const chatId = Date.now();
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            chatItem.innerHTML = `
+                <div class="chat-icon"></div>
+                <span class="chat-title" contenteditable="false">新对话</span>
+                <div class="edit-icon" onclick="editChatTitle(this, ${chatId})"></div>
+            `;
+            chatList.insertBefore(chatItem, chatList.firstChild);
+            selectChat(chatId);
+        }
+
+        function editChatTitle(editIcon, chatId) {
+            const titleSpan = editIcon.previousElementSibling;
+            titleSpan.contentEditable = "true";
+            titleSpan.focus();
+
+            const range = document.createRange();
+            range.selectNodeContents(titleSpan);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            titleSpan.onblur = function() {
+                titleSpan.contentEditable = "false";
+            };
+
+            titleSpan.onkeydown = function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    titleSpan.blur();
+                }
+            };
+        }
+
+        function selectChat(chatId) {
+            currentChatId = chatId;
+            chatHistory = [];
+            document.getElementById("chatDisplay").innerHTML = "";
+        }
+
+        document.getElementById("messageInput").addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 sendMessage();
             }
         });
+
+        // Initialize with a new chat
+        addNewChat();
+
+        // Configure MathJax
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\$$', '\$$']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
     </script>
 </body>
 </html>
+
